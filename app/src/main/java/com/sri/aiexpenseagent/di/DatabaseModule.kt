@@ -3,7 +3,6 @@ package com.sri.aiexpenseagent.di
 import android.content.Context
 import com.sri.aiexpenseagent.data.local.ExpenseDao
 import com.sri.aiexpenseagent.data.local.ExpenseDatabase
-import com.sri.aiexpenseagent.ui.screen.ExpenseViewModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

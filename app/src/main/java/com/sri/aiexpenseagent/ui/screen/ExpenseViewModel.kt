@@ -2,13 +2,11 @@ package com.sri.aiexpenseagent.ui.screen
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.genai.Client
 import com.google.genai.errors.ClientException
 import com.google.genai.types.GenerateContentConfig
 import com.sri.aiexpenseagent.BuildConfig
-import com.sri.aiexpenseagent.data.local.ExpenseDatabase
 import com.sri.aiexpenseagent.data.local.ExpenseEntity
 import com.sri.aiexpenseagent.data.repository.ExpenseRepository
 import com.sri.androidmentorchat.core.model.AIModel
@@ -27,6 +25,7 @@ class ExpenseViewModel @Inject constructor(
     companion object {
         private const val TAG = "ExpenseViewModel"
     }
+
     private val client by lazy {
         Client.builder()
             .apiKey(BuildConfig.GEMINI_API_KEY)
@@ -85,7 +84,7 @@ class ExpenseViewModel @Inject constructor(
         _chatMessages.value += ChatMessage(prompt, isUser = true)
         viewModelScope.launch(Dispatchers.IO) {
             val prompt = _chatMessages.value.joinToString("\n") { history ->
-                "${if(history.isUser) "User" else "Gemini"}: ${history.text}"
+                "${if (history.isUser) "User" else "Gemini"}: ${history.text}"
             }
 
             try {
@@ -98,7 +97,7 @@ class ExpenseViewModel @Inject constructor(
                 _chatMessages.value += ChatMessage(response.text().toString(), isUser = false)
             } catch (e: ClientException) {
                 e.printStackTrace()
-            } catch (e:Exception) {
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
