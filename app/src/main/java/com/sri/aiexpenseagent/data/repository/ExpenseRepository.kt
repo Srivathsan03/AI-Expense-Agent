@@ -3,7 +3,9 @@ package com.sri.aiexpenseagent.data.repository
 import com.sri.aiexpenseagent.data.local.ExpenseDao
 import com.sri.aiexpenseagent.data.local.ExpenseEntity
 
-class ExpenseRepository(
+import javax.inject.Inject
+
+class ExpenseRepository @Inject constructor(
     private val expenseDao: ExpenseDao
 ) {
     fun getAllExpense() = expenseDao.getAllExpenses()

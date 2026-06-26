@@ -17,10 +17,12 @@ import com.sri.aiexpenseagent.data.local.ExpenseDatabase
 import com.sri.aiexpenseagent.data.local.ExpenseEntity
 import com.sri.aiexpenseagent.ui.screen.ExpenseScreen
 import com.sri.aiexpenseagent.ui.theme.AIExpenseAgentTheme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

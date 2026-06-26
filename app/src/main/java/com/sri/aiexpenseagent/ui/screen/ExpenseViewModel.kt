@@ -1,16 +1,40 @@
 package com.sri.aiexpenseagent.ui.screen
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.google.genai.Client
+import com.google.genai.errors.ClientException
+import com.google.genai.types.GenerateContentConfig
+import com.sri.aiexpenseagent.BuildConfig
+import com.sri.aiexpenseagent.data.local.ExpenseDatabase
 import com.sri.aiexpenseagent.data.local.ExpenseEntity
 import com.sri.aiexpenseagent.data.repository.ExpenseRepository
+import com.sri.androidmentorchat.core.model.AIModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ExpenseViewModel(
+@HiltViewModel
+class ExpenseViewModel @Inject constructor(
     private val expenseRepository: ExpenseRepository
 ) : ViewModel() {
+
+    companion object {
+        private const val TAG = "ExpenseViewModel"
+    }
+    private val client by lazy {
+        Client.builder()
+            .apiKey(BuildConfig.GEMINI_API_KEY)
+            .build()
+    }
+
+    private val _chatMessages = MutableStateFlow<List<ChatMessage>>(emptyList())
+    val chatMessages = _chatMessages.asStateFlow()
 
     private val _expenses = MutableStateFlow<List<ExpenseEntity>>(emptyList())
     val expenses = _expenses.asStateFlow()
@@ -53,6 +77,30 @@ class ExpenseViewModel(
                 .collect {
                     _searchResults.value = it
                 }
+        }
+    }
+
+    fun sendMessage(prompt: String) {
+        Log.d(TAG, "sendMessage: prompt = $prompt")
+        _chatMessages.value += ChatMessage(prompt, isUser = true)
+        viewModelScope.launch(Dispatchers.IO) {
+            val prompt = _chatMessages.value.joinToString("\n") { history ->
+                "${if(history.isUser) "User" else "Gemini"}: ${history.text}"
+            }
+
+            try {
+                val response = client.models.generateContent(
+                    AIModel.GEMINI_3_1_FLASH_LITE.modelId,
+                    prompt,
+                    GenerateContentConfig.builder().build()
+                )
+                Log.d(TAG, "sendMessage: response = $response")
+                _chatMessages.value += ChatMessage(response.text().toString(), isUser = false)
+            } catch (e: ClientException) {
+                e.printStackTrace()
+            } catch (e:Exception) {
+                e.printStackTrace()
+            }
         }
     }
 }

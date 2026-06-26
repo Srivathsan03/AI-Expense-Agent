@@ -1,8 +1,17 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
+
+val localProperties = Properties()
+localProperties.load(rootProject.file("local.properties").inputStream())
+
+val geminiApiKey = localProperties.getProperty("GEMINI_API_KEY")
+
 
 android {
     namespace = "com.sri.aiexpenseagent"
@@ -16,6 +25,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField(
+            "String",
+            "GEMINI_API_KEY",
+            "\"$geminiApiKey\""
+        )
     }
 
     buildTypes {
@@ -31,6 +46,15 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
+    }
+
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/INDEX.LIST"
+            excludes += "META-INF/DEPENDENCIES"
+        }
     }
 }
 
@@ -49,9 +73,21 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
+
+    implementation(libs.google.genai)
+    implementation(platform(libs.okhttp.bom))
+    implementation(libs.okhttp)
+
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
+
+    implementation(libs.androidx.compose.material.icons.extended)
+
+    implementation(libs.compose.markdown)
 
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
