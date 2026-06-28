@@ -22,7 +22,7 @@ interface ExpenseDao {
             ORDER BY createdAt DESC
         """
     )
-    fun searchExpenses(query:String):Flow<List<ExpenseEntity>>
+    fun searchExpenses(query: String): Flow<List<ExpenseEntity>>
 
     @Delete
     suspend fun deleteEntity(entity: ExpenseEntity)
