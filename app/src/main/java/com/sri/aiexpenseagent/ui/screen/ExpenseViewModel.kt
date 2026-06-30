@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sri.aiexpenseagent.agent.ExpenseAgent
 import com.sri.aiexpenseagent.agent.model.ToolResult
-import com.sri.aiexpenseagent.data.local.ExpenseEntity
 import com.sri.aiexpenseagent.data.repository.ExpenseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,36 +28,6 @@ class ExpenseViewModel @Inject constructor(
                 .collect {
                     _uiState.value = _uiState.value.copy(
                         expenses = it
-                    )
-                }
-        }
-    }
-
-    fun addExpense(
-        title: String,
-        amount: Double,
-        category: String
-    ) {
-        viewModelScope.launch {
-            expenseRepository.insertExpense(
-                ExpenseEntity(
-                    title = title,
-                    amount = amount,
-                    category = category,
-                    createdAt = System.currentTimeMillis()
-                )
-            )
-        }
-    }
-
-    fun searchExpenses(
-        query: String
-    ) {
-        viewModelScope.launch {
-            expenseRepository.searchExpenses(query)
-                .collect {
-                    _uiState.value = _uiState.value.copy(
-                        searchResults = it
                     )
                 }
         }
