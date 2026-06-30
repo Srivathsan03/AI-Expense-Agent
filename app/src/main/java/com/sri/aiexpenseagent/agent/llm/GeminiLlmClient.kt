@@ -1,23 +1,37 @@
 package com.sri.aiexpenseagent.agent.llm
 
-import kotlinx.serialization.json.Json
 import com.sri.aiexpenseagent.agent.model.ToolRequest
+import kotlinx.serialization.json.Json
 
 class GeminiLlmClient(
     private val repository: GeminiRepository,
     private val promptBuilder: PromptBuilder
 ) : LlmClient {
     override suspend fun getToolCall(userMessage: String): ToolRequest {
-        val prompt = promptBuilder.buildPrompt(userMessage)
-        val response = repository.geminiResponse(
-            prompt = prompt
-        )
-        return parseResponse(response)
+        return try {
+            val prompt = promptBuilder.buildPrompt(userMessage)
+            val response = repository.geminiResponse(
+                prompt = prompt
+            )
+            parseResponse(response)
+        } catch (e: Exception) {
+            ToolRequest(
+                tool = "unknown",
+                arguments = mapOf("error" to e.message.toString())
+            )
+        }
     }
 
     private fun parseResponse(
         json: String
     ): ToolRequest {
-        return Json.decodeFromString(json)
+        return try {
+            Json.decodeFromString(json)
+        } catch (e: Exception) {
+            ToolRequest(
+                tool = "unknown",
+                arguments = mapOf("error" to e.message.toString())
+            )
+        }
     }
 }

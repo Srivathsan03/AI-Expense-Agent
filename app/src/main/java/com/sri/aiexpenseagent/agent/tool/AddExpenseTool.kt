@@ -13,7 +13,7 @@ class AddExpenseTool(
     override suspend fun execute(arguments: Map<String, String>): ToolResult {
         val title = arguments["title"] ?: return ToolResult.Error("Title is required")
         val amount = arguments["amount"]?.toDoubleOrNull()
-            ?: return ToolResult.Error("Amount is required")
+            ?: return ToolResult.Error("Invalid amount")
         val category = arguments["category"] ?: return ToolResult.Error("Category is required")
 
         repository.insertExpense(

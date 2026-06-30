@@ -25,41 +25,64 @@ class ExpenseViewModel @Inject constructor(
         viewModelScope.launch {
             expenseRepository
                 .getAllExpense()
-                .collect {
-                    _uiState.value = _uiState.value.copy(
-                        expenses = it
-                    )
+                .collect { expenses ->
+                    _uiState.update { state ->
+                        state.copy(
+                            expenses = expenses
+                        )
+                    }
                 }
         }
     }
 
     fun sendMessage(prompt: String) {
-        _uiState.value = _uiState.value.copy(
-            messages = _uiState.value.messages + ChatMessage(text = prompt, isUser = true)
-        )
+        _uiState.update { state ->
+            state.copy(
+                messages = state.messages + ChatMessage(text = prompt, isUser = true)
+            )
+        }
         viewModelScope.launch {
-            _uiState.update {
-                it.copy(
-                    isLoading = true
-                )
-            }
-            val result = agent.chat(prompt)
-            when(result) {
-                is ToolResult.Success -> {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            response = result.message
-                        )
+            try {
+                _uiState.update { state ->
+                    state.copy(
+                        isLoading = true
+                    )
+                }
+                val result = agent.chat(prompt)
+                when (result) {
+                    is ToolResult.Success -> {
+                        _uiState.update { state ->
+                            state.copy(
+                                isLoading = false,
+                                response = result.message,
+                                messages = state.messages + ChatMessage(
+                                    text = result.message,
+                                    isUser = false
+                                )
+                            )
+                        }
+                    }
+
+                    is ToolResult.Error -> {
+                        _uiState.update { state ->
+                            state.copy(
+                                isLoading = false,
+                                response = result.errorMessage,
+                                messages = state.messages + ChatMessage(
+                                    text = result.errorMessage,
+                                    isUser = false
+                                )
+                            )
+                        }
                     }
                 }
-                is ToolResult.Error -> {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            response = result.errorMessage
-                        )
-                    }
+            } catch (e:Exception) {
+                e.printStackTrace()
+            } finally {
+                _uiState.update { state ->
+                    state.copy(
+                        isLoading = false
+                    )
                 }
             }
         }
