@@ -19,6 +19,7 @@ interface ExpenseDao {
         """
             SELECT * FROM expenses
             WHERE title LIKE '%' || :query || '%'
+            OR category LIKE '%' || :query || '%'
             ORDER BY createdAt DESC
         """
     )

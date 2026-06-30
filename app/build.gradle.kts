@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 val localProperties = Properties()
@@ -88,6 +89,8 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
 
     implementation(libs.compose.markdown)
+    
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))

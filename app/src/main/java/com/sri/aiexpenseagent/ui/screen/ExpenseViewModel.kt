@@ -7,6 +7,7 @@ import com.google.genai.Client
 import com.google.genai.errors.ClientException
 import com.google.genai.types.GenerateContentConfig
 import com.sri.aiexpenseagent.BuildConfig
+import com.sri.aiexpenseagent.agent.ExpenseAgent
 import com.sri.aiexpenseagent.data.local.ExpenseEntity
 import com.sri.aiexpenseagent.data.repository.ExpenseRepository
 import com.sri.androidmentorchat.core.model.AIModel
@@ -19,7 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ExpenseViewModel @Inject constructor(
-    private val expenseRepository: ExpenseRepository
+    private val expenseRepository: ExpenseRepository,
+    private val agent: ExpenseAgent
 ) : ViewModel() {
 
     companion object {
@@ -79,27 +81,34 @@ class ExpenseViewModel @Inject constructor(
         }
     }
 
-    fun sendMessage(prompt: String) {
-        Log.d(TAG, "sendMessage: prompt = $prompt")
-        _chatMessages.value += ChatMessage(prompt, isUser = true)
-        viewModelScope.launch(Dispatchers.IO) {
-            val prompt = _chatMessages.value.joinToString("\n") { history ->
-                "${if (history.isUser) "User" else "Gemini"}: ${history.text}"
-            }
+//    fun sendMessage(prompt: String) {
+//        Log.d(TAG, "sendMessage: prompt = $prompt")
+//        _chatMessages.value += ChatMessage(prompt, isUser = true)
+//        viewModelScope.launch(Dispatchers.IO) {
+//            val prompt = _chatMessages.value.joinToString("\n") { history ->
+//                "${if (history.isUser) "User" else "Gemini"}: ${history.text}"
+//            }
+//
+//            try {
+//                val response = client.models.generateContent(
+//                    AIModel.GEMINI_3_1_FLASH_LITE.modelId,
+//                    prompt,
+//                    GenerateContentConfig.builder().build()
+//                )
+//                Log.d(TAG, "sendMessage: response = $response")
+//                _chatMessages.value += ChatMessage(response.text().toString(), isUser = false)
+//            } catch (e: ClientException) {
+//                e.printStackTrace()
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//            }
+//        }
+//    }
 
-            try {
-                val response = client.models.generateContent(
-                    AIModel.GEMINI_3_1_FLASH_LITE.modelId,
-                    prompt,
-                    GenerateContentConfig.builder().build()
-                )
-                Log.d(TAG, "sendMessage: response = $response")
-                _chatMessages.value += ChatMessage(response.text().toString(), isUser = false)
-            } catch (e: ClientException) {
-                e.printStackTrace()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+    fun sendMessage(prompt: String) {
+        _chatMessages.value += ChatMessage(text = prompt, isUser = true)
+        viewModelScope.launch {
+            agent.chat(prompt)
         }
     }
 }
