@@ -1,18 +1,11 @@
 package com.sri.aiexpenseagent.ui.screen
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.genai.Client
-import com.google.genai.errors.ClientException
-import com.google.genai.types.GenerateContentConfig
-import com.sri.aiexpenseagent.BuildConfig
 import com.sri.aiexpenseagent.agent.ExpenseAgent
 import com.sri.aiexpenseagent.data.local.ExpenseEntity
 import com.sri.aiexpenseagent.data.repository.ExpenseRepository
-import com.sri.androidmentorchat.core.model.AIModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -23,16 +16,6 @@ class ExpenseViewModel @Inject constructor(
     private val expenseRepository: ExpenseRepository,
     private val agent: ExpenseAgent
 ) : ViewModel() {
-
-    companion object {
-        private const val TAG = "ExpenseViewModel"
-    }
-
-    private val client by lazy {
-        Client.builder()
-            .apiKey(BuildConfig.GEMINI_API_KEY)
-            .build()
-    }
 
     private val _chatMessages = MutableStateFlow<List<ChatMessage>>(emptyList())
     val chatMessages = _chatMessages.asStateFlow()
