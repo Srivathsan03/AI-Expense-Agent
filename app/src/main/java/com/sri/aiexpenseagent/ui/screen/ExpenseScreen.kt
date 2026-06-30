@@ -39,9 +39,9 @@ import dev.jeziellago.compose.markdowntext.MarkdownText
 
 @Composable
 fun ExpenseScreen(viewModel: ExpenseViewModel = hiltViewModel()) {
-    val chatMessages by viewModel.chatMessages.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     ExpenseScreenContent(
-        chatMessages = chatMessages,
+        chatMessages = uiState.messages,
         onSendMessage = viewModel::sendMessage
     )
 }

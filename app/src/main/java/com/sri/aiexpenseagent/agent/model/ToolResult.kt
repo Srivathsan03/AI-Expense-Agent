@@ -8,6 +8,6 @@ sealed interface ToolResult {
     ) : ToolResult
 
     data class Error(
-        val message: String
+        val errorMessage: String
     ) : ToolResult
 }
