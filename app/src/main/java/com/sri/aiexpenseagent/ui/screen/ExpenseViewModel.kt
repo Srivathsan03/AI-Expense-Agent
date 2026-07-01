@@ -54,7 +54,6 @@ class ExpenseViewModel @Inject constructor(
                         _uiState.update { state ->
                             state.copy(
                                 isLoading = false,
-                                response = result.message,
                                 messages = state.messages + ChatMessage(
                                     text = result.message,
                                     isUser = false
@@ -67,7 +66,6 @@ class ExpenseViewModel @Inject constructor(
                         _uiState.update { state ->
                             state.copy(
                                 isLoading = false,
-                                response = result.errorMessage,
                                 messages = state.messages + ChatMessage(
                                     text = result.errorMessage,
                                     isUser = false
