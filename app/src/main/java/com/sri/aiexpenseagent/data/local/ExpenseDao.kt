@@ -4,7 +4,6 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ExpenseDao {
@@ -13,7 +12,7 @@ interface ExpenseDao {
     suspend fun insertExpense(expense: ExpenseEntity)
 
     @Query("SELECT * FROM expenses")
-    fun getAllExpenses(): Flow<List<ExpenseEntity>>
+    fun getAllExpenses(): List<ExpenseEntity>
 
     @Query(
         """
@@ -23,7 +22,7 @@ interface ExpenseDao {
             ORDER BY createdAt DESC
         """
     )
-    fun searchExpenses(query: String): Flow<List<ExpenseEntity>>
+    fun searchExpenses(query: String): List<ExpenseEntity>
 
     @Delete
     suspend fun deleteEntity(entity: ExpenseEntity)

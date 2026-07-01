@@ -1,5 +1,6 @@
 package com.sri.aiexpenseagent.ui.screen
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sri.aiexpenseagent.agent.ExpenseAgent
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,20 +22,6 @@ class ExpenseViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(ChatUiState())
     val uiState = _uiState.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            expenseRepository
-                .getAllExpense()
-                .collect { expenses ->
-                    _uiState.update { state ->
-                        state.copy(
-                            expenses = expenses
-                        )
-                    }
-                }
-        }
-    }
 
     fun sendMessage(prompt: String) {
         _uiState.update { state ->
@@ -51,14 +39,41 @@ class ExpenseViewModel @Inject constructor(
                 val result = agent.chat(prompt)
                 when (result) {
                     is ToolResult.Success -> {
-                        _uiState.update { state ->
-                            state.copy(
-                                isLoading = false,
-                                messages = state.messages + ChatMessage(
-                                    text = result.message,
-                                    isUser = false
+                        result.data?.let { expensesEntities ->
+                            Log.d("TAG", "sendMessage: $expensesEntities")
+                            val response = StringBuilder()
+                            expensesEntities.forEach { expenseEntity ->
+                                response.append(
+                                    buildString {
+                                        appendLine("Category: ${expenseEntity.category}")
+                                        appendLine("Title: ${expenseEntity.title}")
+                                        appendLine("Amount: ${expenseEntity.amount}")
+                                        appendLine("CreatedAt: ${Date(expenseEntity.createdAt)}")
+                                        appendLine()
+                                    }
                                 )
-                            )
+                            }
+                            _uiState.update { state ->
+                                state.copy(
+                                    isLoading = false,
+                                    messages = state.messages + ChatMessage(
+                                        text = response.toString(),
+                                        isUser = false
+                                    )
+                                )
+                            }
+                        } ?: run {
+                            Log.d("TAG", "sendMessage: data == null")
+                            _uiState.update { state ->
+                                Log.d("TAG", "sendMessage: data == null")
+                                state.copy(
+                                    isLoading = false,
+                                    messages = state.messages + ChatMessage(
+                                        text = result.message,
+                                        isUser = false
+                                    )
+                                )
+                            }
                         }
                     }
 
@@ -74,7 +89,7 @@ class ExpenseViewModel @Inject constructor(
                         }
                     }
                 }
-            } catch (e:Exception) {
+            } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
                 _uiState.update { state ->
