@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sri.aiexpenseagent.agent.ExpenseAgent
 import com.sri.aiexpenseagent.agent.model.ToolResult
-import com.sri.aiexpenseagent.data.repository.ExpenseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +15,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ExpenseViewModel @Inject constructor(
-    private val expenseRepository: ExpenseRepository,
     private val agent: ExpenseAgent
 ) : ViewModel() {
 
