@@ -11,9 +11,9 @@ class ExpenseAgent @Inject constructor(
     private val registry: ToolRegistry
 ) {
     suspend fun chat(message: String): ToolResult {
-        val toolCall = aiService.processMessage(message)
-        val tool = registry.getTool(toolCall.tool)
+        val toolRequest = aiService.processMessage(message)
+        val tool = registry.getTool(toolRequest.tool)
             ?: return ToolResult.Error("Tool not found")
-        return tool.execute(toolCall.arguments)
+        return tool.execute(toolRequest.arguments)
     }
 }
