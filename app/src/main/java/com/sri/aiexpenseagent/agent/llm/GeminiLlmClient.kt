@@ -7,7 +7,7 @@ class GeminiLlmClient(
     private val repository: GeminiRepository,
     private val promptBuilder: PromptBuilder
 ) : LlmClient {
-    override suspend fun getToolCall(userMessage: String): ToolRequest {
+    override suspend fun getToolRequest(userMessage: String): ToolRequest {
         return try {
             val prompt = promptBuilder.buildPrompt(userMessage)
             val response = repository.geminiResponse(

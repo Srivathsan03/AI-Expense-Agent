@@ -7,6 +7,6 @@ class ExpenseAiServiceImpl(
     private val llmClient: LlmClient
 ): ExpenseAiService {
     override suspend fun processMessage(userMessage: String): ToolRequest {
-        return llmClient.getToolCall(userMessage)
+        return llmClient.getToolRequest(userMessage)
     }
 }

@@ -4,7 +4,7 @@ import com.sri.aiexpenseagent.agent.model.ToolRequest
 
 interface LlmClient {
 
-    suspend fun getToolCall(
+    suspend fun getToolRequest(
         userMessage: String
     ): ToolRequest
 }
