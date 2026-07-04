@@ -5,7 +5,7 @@ import com.sri.aiexpenseagent.agent.model.ToolRequest
 
 class ExpenseAiServiceImpl(
     private val llmClient: LlmClient
-): ExpenseAiService {
+) : ExpenseAiService {
     override suspend fun processMessage(userMessage: String): ToolRequest {
         return llmClient.getToolRequest(userMessage)
     }

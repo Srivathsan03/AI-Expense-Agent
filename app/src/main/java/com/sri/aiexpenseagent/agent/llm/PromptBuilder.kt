@@ -77,7 +77,7 @@ class PromptBuilder {
             }
         """.trimIndent()
 
-    private fun categories():String {
+    private fun categories(): String {
         val categories = ExpenseCategory.entries.joinToString(separator = "\n") {
             "- ${it.name}"
         }
